@@ -30,6 +30,7 @@
 		051FC7DF1A68A95300F4D690 /* JShape.swift in Sources */ = {isa = PBXBuildFile; fileRef = 051FC7DE1A68A95300F4D690 /* JShape.swift */; };
 		051FC7E11A68A97200F4D690 /* SShape.swift in Sources */ = {isa = PBXBuildFile; fileRef = 051FC7E01A68A97200F4D690 /* SShape.swift */; };
 		051FC7E31A68A98300F4D690 /* ZShape.swift in Sources */ = {isa = PBXBuildFile; fileRef = 051FC7E21A68A98300F4D690 /* ZShape.swift */; };
+		051FC7E51A68AAF600F4D690 /* Swiftris.swift in Sources */ = {isa = PBXBuildFile; fileRef = 051FC7E41A68AAF600F4D690 /* Swiftris.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -70,6 +71,7 @@
 		051FC7DE1A68A95300F4D690 /* JShape.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = JShape.swift; sourceTree = "<group>"; };
 		051FC7E01A68A97200F4D690 /* SShape.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SShape.swift; sourceTree = "<group>"; };
 		051FC7E21A68A98300F4D690 /* ZShape.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ZShape.swift; sourceTree = "<group>"; };
+		051FC7E41A68AAF600F4D690 /* Swiftris.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Swiftris.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -118,6 +120,7 @@
 				051FC79B1A67561F00F4D690 /* Main.storyboard */,
 				051FC7D21A6807C000F4D690 /* Block.swift */,
 				051FC7D41A6878C900F4D690 /* Shape.swift */,
+				051FC7E41A68AAF600F4D690 /* Swiftris.swift */,
 				051FC7D61A68A89C00F4D690 /* SquareShape.swift */,
 				051FC7D81A68A8D200F4D690 /* TShape.swift */,
 				051FC7DA1A68A91500F4D690 /* LineShape.swift */,
@@ -281,6 +284,7 @@
 				051FC7D71A68A89D00F4D690 /* SquareShape.swift in Sources */,
 				051FC7981A67561F00F4D690 /* GameScene.swift in Sources */,
 				051FC7DF1A68A95300F4D690 /* JShape.swift in Sources */,
+				051FC7E51A68AAF600F4D690 /* Swiftris.swift in Sources */,
 				051FC7D51A6878C900F4D690 /* Shape.swift in Sources */,
 				051FC7D11A6761F300F4D690 /* Array2D.swift in Sources */,
 				051FC7DB1A68A91500F4D690 /* LineShape.swift in Sources */,
