@@ -205,11 +205,13 @@ class GameViewController: UIViewController, SwiftrisDelegate, UIGestureRecognize
         view.userInteractionEnabled = false
         scene.stopTicking()
         scene.playSound("gameover.mp3")
+        let score = swiftris.score
+        let level = swiftris.level
         scene.animateCollapsingLines(swiftris.removeAllBlocks(), fallenBlocks: Array<Array<Block>>()) {
             // report the score to game center
             println("Game ended")
             self.scene.backgroundAudioPlayer.stop()
-            self.delegate?.gameDidEnd(score: self.swiftris.score, level: self.swiftris.level)
+            self.delegate?.gameDidEnd(score: score, level: level)
             self.navigationController?.popToRootViewControllerAnimated(true)
         }
     }

@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import GameKit
 
 class ConfigurationController: UIViewController, UITextFieldDelegate, GameViewControllerDelegate {
     
@@ -21,6 +22,7 @@ class ConfigurationController: UIViewController, UITextFieldDelegate, GameViewCo
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        setupGameFields()
     }
     
     override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
@@ -36,6 +38,10 @@ class ConfigurationController: UIViewController, UITextFieldDelegate, GameViewCo
     }
     
     @IBAction func gameModeChanged(sender: UISegmentedControl) {
+        setupGameFields()
+    }
+    
+    func setupGameFields() {
         switch (gameModeSegmentedControl.selectedSegmentIndex) {
         case 0:
             println("Classic mode selected")
@@ -48,7 +54,6 @@ class ConfigurationController: UIViewController, UITextFieldDelegate, GameViewCo
         default:
             println("Error: invalid index for segment control")
         }
-
     }
     
     @IBAction func showLeaderBoard(sender: UIButton) {
@@ -57,7 +62,23 @@ class ConfigurationController: UIViewController, UITextFieldDelegate, GameViewCo
     
     func gameDidEnd(#score: Int?, level: Int?) {
         println("Scored \(score) at level \(level)")
+        if let reportingScore = score {
+            var myScore: Int64
+            myScore = Int64(reportingScore)
+            reportScore(myScore, leaderBoardID: "SwiftrisHighScore")
+        }
     }
+    
+    func reportScore(score:Int64, leaderBoardID:String) {
+        var scoreReporter = GKScore(leaderboardIdentifier: "SwiftrisHighScore")
+        scoreReporter.value = score
+        scoreReporter.context = 0
+        GKScore.reportScores([scoreReporter], withCompletionHandler: { (error) -> Void in
+            println("Completed Sending Score with Error: \(error)")
+        })
+    }
+    
+    // Textfield Delegate
     
     func textFieldShouldReturn(textField: UITextField) -> Bool {
         textField.resignFirstResponder()
