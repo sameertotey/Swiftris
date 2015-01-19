@@ -51,9 +51,7 @@ class GameViewController: UIViewController, SwiftrisDelegate, UIGestureRecognize
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        // listen to Game Center authentication requests
-        NSNotificationCenter.defaultCenter().addObserver(self, selector: "showAuthenticationViewController:", name: presentGameCenterAuthenticationVeiwController, object: nil)
-
+ 
         // Configure the view.
         let skView = view as SKView
         skView.multipleTouchEnabled = false
@@ -79,19 +77,6 @@ class GameViewController: UIViewController, SwiftrisDelegate, UIGestureRecognize
         }
 
         
-    }
-
-    func showAuthenticationViewController(notification: NSNotification) {
-        println("Show Notification")
-        if let presentedVC = self.presentedViewController {
-            dismissViewControllerAnimated(true, completion: nil)
-        }
-        changeGameStateTo(paused: true)
-        presentViewController(notification.object as UIViewController, animated: true, completion: nil)
-    }
-
-    deinit {
-        NSNotificationCenter.defaultCenter().removeObserver(self)
     }
 
     override func prefersStatusBarHidden() -> Bool {

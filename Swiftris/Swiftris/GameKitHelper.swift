@@ -25,6 +25,7 @@ class GameKitHelper : NSObject {
     }
     
     func authenticateLocalPlayer() {
+        println("Authenticate Local Player called")
         let localPlayer = GKLocalPlayer.localPlayer()
         localPlayer.authenticateHandler = {(viewController:UIViewController!, error:NSError!) in
             self.lastError = error
