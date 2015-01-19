@@ -9,18 +9,50 @@
 import UIKit
 import SpriteKit
 
+enum GameMode {
+    case classic
+    case timed
+}
+
+protocol GameViewControllerDelegate {
+    func gameDidEnd(#score:Int?, level:Int?)
+}
+
 class GameViewController: UIViewController, SwiftrisDelegate, UIGestureRecognizerDelegate {
 
     var scene: GameScene!
     var swiftris:Swiftris!
     
     var panPointReference:CGPoint?
-
+    
+    var delegate: GameViewControllerDelegate?
+    
+    var gameMode: GameMode = .classic{
+        didSet {
+            if gameMode == .classic{
+                self.timeRemainingLabel?.hidden = true
+            } else {
+                self.timeRemainingLabel?.hidden = false
+            }
+        }
+    }
+    
+    var gameStartTime = NSDate()
+    var gameElapsedTime = NSTimeInterval()
+    var maxTime = 60.0
+    
     @IBOutlet weak var scoreLabel: UILabel!
     @IBOutlet weak var levelLabel: UILabel!
     
+    @IBOutlet weak var pausedLabel: UILabel!
+    
+    @IBOutlet weak var timeRemainingLabel: UILabel!
+    
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        // listen to Game Center authentication requests
+        NSNotificationCenter.defaultCenter().addObserver(self, selector: "showAuthenticationViewController:", name: presentGameCenterAuthenticationVeiwController, object: nil)
 
         // Configure the view.
         let skView = view as SKView
@@ -39,6 +71,27 @@ class GameViewController: UIViewController, SwiftrisDelegate, UIGestureRecognize
         // Present the scene.
         skView.presentScene(scene)
         
+        // This is required because the view outlets are not set in the prepare for Segue in the previous controller
+        if gameMode == .classic{
+            self.timeRemainingLabel?.hidden = true
+        } else {
+            self.timeRemainingLabel?.hidden = false
+        }
+
+        
+    }
+
+    func showAuthenticationViewController(notification: NSNotification) {
+        println("Show Notification")
+        if let presentedVC = self.presentedViewController {
+            dismissViewControllerAnimated(true, completion: nil)
+        }
+        changeGameStateTo(paused: true)
+        presentViewController(notification.object as UIViewController, animated: true, completion: nil)
+    }
+
+    deinit {
+        NSNotificationCenter.defaultCenter().removeObserver(self)
     }
 
     override func prefersStatusBarHidden() -> Bool {
@@ -52,9 +105,7 @@ class GameViewController: UIViewController, SwiftrisDelegate, UIGestureRecognize
     @IBAction func didPan(sender: UIPanGestureRecognizer) {
         let currentPoint = sender.translationInView(self.view)
         if let originalPoint = panPointReference {
-            // #3
             if abs(currentPoint.x - originalPoint.x) > (BlockSize * 0.9) {
-                // #4
                 if sender.velocityInView(self.view).x > CGFloat(0) {
                     swiftris.moveShapeRight()
                     panPointReference = currentPoint
@@ -91,6 +142,15 @@ class GameViewController: UIViewController, SwiftrisDelegate, UIGestureRecognize
     
     func didTick() {
         swiftris.letShapeFall()
+        if gameMode == .timed {
+            gameElapsedTime = gameStartTime.timeIntervalSinceNow
+            println("TimeInterval \(gameElapsedTime * -1)")
+            if  (maxTime + gameElapsedTime) > 0 {
+                timeRemainingLabel.text = "\(maxTime + gameElapsedTime)"
+            } else {
+                changeGameStateTo(paused: true)
+            }
+        }
     }
     
     func nextShape() {
@@ -98,17 +158,38 @@ class GameViewController: UIViewController, SwiftrisDelegate, UIGestureRecognize
         if let fallingShape = newShapes.fallingShape {
             self.scene.addPreviewShapeToScene(newShapes.nextShape!) {}
             self.scene.movePreviewShape(fallingShape) {
-                // #2
                 self.view.userInteractionEnabled = true
                 self.scene.startTicking()
             }
         }
     }
+    @IBAction func didLongPress(sender: UILongPressGestureRecognizer) {
+        // pause sprite kit
+        if sender.state == .Began {
+            let skView = view as SKView
+            // toggle the paused state of the game
+            changeGameStateTo(paused: !skView.paused)
+        }
+     }
     
+    func changeGameStateTo(#paused:Bool) {
+        let skView = view as SKView
+        skView.paused = paused
+        pausedLabel.hidden = !paused
+        if skView.paused {
+            scene.backgroundAudioPlayer.pause()
+        } else {
+            scene.backgroundAudioPlayer.play()
+        }
+
+    }
+    
+     
     func gameDidBegin(swiftris: Swiftris) {
         levelLabel.text = "\(swiftris.level)"
         scoreLabel.text = "\(swiftris.score)"
         scene.tickLengthMillis = TickLengthLevelOne
+        gameStartTime = NSDate()
 
         // The following is false when restarting a new game
         if swiftris.nextShape != nil && swiftris.nextShape!.blocks[0].sprite == nil {
@@ -125,7 +206,11 @@ class GameViewController: UIViewController, SwiftrisDelegate, UIGestureRecognize
         scene.stopTicking()
         scene.playSound("gameover.mp3")
         scene.animateCollapsingLines(swiftris.removeAllBlocks(), fallenBlocks: Array<Array<Block>>()) {
-            swiftris.beginGame()
+            // report the score to game center
+            println("Game ended")
+            self.scene.backgroundAudioPlayer.stop()
+            self.delegate?.gameDidEnd(score: self.swiftris.score, level: self.swiftris.level)
+            self.navigationController?.popToRootViewControllerAnimated(true)
         }
     }
     
@@ -164,8 +249,8 @@ class GameViewController: UIViewController, SwiftrisDelegate, UIGestureRecognize
         }
     }
     
-    // #3
     func gameShapeDidMove(swiftris: Swiftris) {
         scene.redrawShape(swiftris.fallingShape!) {}
     }
+    
 }
