@@ -75,10 +75,19 @@ class GameViewController: UIViewController, SwiftrisDelegate, UIGestureRecognize
         } else {
             self.timeRemainingLabel?.hidden = false
         }
-
+        NSNotificationCenter.defaultCenter().addObserver(self, selector: "pauseGame", name: pauseTheGame, object: nil)
         
     }
-
+    
+    deinit {
+        NSNotificationCenter.defaultCenter().removeObserver(self)
+    }
+    
+    func pauseGame() {
+        changeGameStateTo(paused: true)
+        println("Game Paused")
+    }
+    
     override func prefersStatusBarHidden() -> Bool {
         return true
     }
@@ -126,14 +135,16 @@ class GameViewController: UIViewController, SwiftrisDelegate, UIGestureRecognize
     }
     
     func didTick() {
-        swiftris.letShapeFall()
-        if gameMode == .timed {
-            gameElapsedTime = gameStartTime.timeIntervalSinceNow
-            println("TimeInterval \(gameElapsedTime * -1)")
-            if  (maxTime + gameElapsedTime) > 0 {
-                timeRemainingLabel.text = "\(maxTime + gameElapsedTime)"
-            } else {
-                changeGameStateTo(paused: true)
+        if pausedLabel.hidden {
+            swiftris.letShapeFall()
+            if gameMode == .timed {
+                gameElapsedTime = gameStartTime.timeIntervalSinceNow
+                println("TimeInterval \(gameElapsedTime * -1)")
+                if  (maxTime + gameElapsedTime) > 0 {
+                    timeRemainingLabel.text = "\(maxTime + gameElapsedTime)"
+                } else {
+                    changeGameStateTo(paused: true)
+                }
             }
         }
     }

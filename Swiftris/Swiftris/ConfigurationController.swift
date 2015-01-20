@@ -26,6 +26,8 @@ class ConfigurationController: UIViewController, UITextFieldDelegate, GameViewCo
         NSNotificationCenter.defaultCenter().addObserver(self, selector: "showAuthenticationViewController:", name: presentGameCenterAuthenticationVeiwController, object: nil)
 
         setupGameFields()
+        var model = Model()
+        model.foo()
     }
     
     override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
@@ -124,7 +126,7 @@ class ConfigurationController: UIViewController, UITextFieldDelegate, GameViewCo
         gameCenterViewController.leaderboardIdentifier = leaderBoardID
         presentViewController(gameCenterViewController, animated: true, completion: nil)
     }
-        
+    
     func reportAllAchievements(achievements:Dictionary<String, Double>) {
         var myAchievements = [GKAchievement]()
         for (identifier, percent) in achievements {
@@ -139,14 +141,14 @@ class ConfigurationController: UIViewController, UITextFieldDelegate, GameViewCo
 
     }
     
-    // GKGameCenterDelegate
+    // MARK: - GKGameCenterDelegate
     
     func gameCenterViewControllerDidFinish(gameCenterViewController: GKGameCenterViewController!) {
         println("Game Center View Controller Did Finish")
         dismissViewControllerAnimated(true, completion: nil)
     }
     
-    // Textfield Delegate
+    // MARK:- Textfield Delegate
     
     func textFieldShouldReturn(textField: UITextField) -> Bool {
         textField.resignFirstResponder()
