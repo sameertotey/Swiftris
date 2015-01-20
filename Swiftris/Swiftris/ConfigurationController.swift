@@ -83,13 +83,34 @@ class ConfigurationController: UIViewController, UITextFieldDelegate, GameViewCo
             var myScore: Int64
             myScore = Int64(reportingScore)
             reportScore(myScore, leaderBoardID: "SwiftrisHighScore")
+            if let reportingLevel = level {
+                var myLevel = reportingLevel - 1
+                var myPercent:Double
+                myPercent = Double(myScore) % 100.00
+                var achievements = [String:Double]()
+                switch myLevel {
+                case 0:
+                    achievements["SwiftrisLevel1"] = myPercent
+                    achievements["SwiftrisLevel2"] = 0.00
+                case 1:
+                    achievements["SwiftrisLevel1"] = 100.0
+                    achievements["SwiftrisLevel2"] = myPercent
+                case 2:
+                    achievements["SwiftrisLevel1"] = 100.0
+                    achievements["SwiftrisLevel2"] = 100.00
+                default:
+                    println("Somebody have moved to higher levels!!!!")
+                }
+                reportAllAchievements(achievements)
+            }
         }
         displayLeaderBoard("SwiftrisHighScore")
     }
     
     func reportScore(score:Int64, leaderBoardID:String) {
-        var scoreReporter = GKScore(leaderboardIdentifier: "SwiftrisHighScore")
+        let scoreReporter = GKScore(leaderboardIdentifier: "SwiftrisHighScore")
         scoreReporter.value = score
+        println("Reporting Score \(score)")
         scoreReporter.context = 0
         GKScore.reportScores([scoreReporter], withCompletionHandler: { (error) -> Void in
             println("Completed Sending Score with Error: \(error)")
@@ -97,11 +118,25 @@ class ConfigurationController: UIViewController, UITextFieldDelegate, GameViewCo
     }
     
     func displayLeaderBoard(leaderBoardID:String) {
-        var gameCenterViewController = GKGameCenterViewController()
+        let gameCenterViewController = GKGameCenterViewController()
         gameCenterViewController.gameCenterDelegate = self
         gameCenterViewController.viewState = .Leaderboards
-        gameCenterViewController.leaderboardIdentifier = "SwiftrisHighScore"
+        gameCenterViewController.leaderboardIdentifier = leaderBoardID
         presentViewController(gameCenterViewController, animated: true, completion: nil)
+    }
+        
+    func reportAllAchievements(achievements:Dictionary<String, Double>) {
+        var myAchievements = [GKAchievement]()
+        for (identifier, percent) in achievements {
+            let achievement = GKAchievement(identifier: identifier)
+            achievement.percentComplete = percent
+            println("Reporting achievement \(identifier) for \(percent)")
+            myAchievements.append(achievement)
+        }
+        GKAchievement.reportAchievements(myAchievements, withCompletionHandler: { (error) -> Void in
+            println("Completed Sending Achievements with Error: \(error)")
+        })
+
     }
     
     // GKGameCenterDelegate
